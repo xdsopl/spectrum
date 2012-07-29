@@ -1,0 +1,5 @@
+- decouple audio input from visual output using threads.
+- make timing of frames more robust and accurate
+- add keybinds like for changing gauss parameter
+- how about geometrically spaced bins for music?
+
