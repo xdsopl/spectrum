@@ -18,6 +18,8 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 #define STEP (8)
 static int pause;
 static int rms_comp = 1;
+static int norm_vis = 1;
+static int log_vis = 1;
 
 void handle_events()
 {
@@ -31,6 +33,12 @@ void handle_events()
 						break;
 					case SDLK_c:
 						rms_comp ^= 1;
+						break;
+					case SDLK_l:
+						log_vis ^= 1;
+						break;
+					case SDLK_n:
+						norm_vis ^= 1;
 						break;
 					case SDLK_SPACE:
 						pause ^= 1;
@@ -126,6 +134,13 @@ int main(int argc, char **argv)
 	for (int i = 0; i < rms_hist_size; i++)
 		rms_hist[i] = 1.0;
 
+	float max_hist_seconds = 0.5;
+	int max_hist_size = (max_hist_seconds * rate) / STEP;
+	float *max_hist = (float *)malloc(sizeof(float) * max_hist_size);
+	int max_hist_last = 0;
+	for (int i = 0; i < max_hist_size; i++)
+		max_hist[i] = 0.0;
+
 	uint64_t cnt = 0;
 	for (;;) {
 		if (cnt++ > rate / (STEP * 50)) {
@@ -161,8 +176,8 @@ int main(int argc, char **argv)
 		for (int i = 0; i < rms_hist_size; i++)
 			rms_sum += rms_hist[i];
 
-		float rms = sqrtf(rms_sum / (float)(rms_hist_size * STEP));
-		float rec_rms = 1.0 / fmax(0.01, rms);
+		float rms_tmp = sqrtf(rms_sum / (float)(rms_hist_size * STEP));
+		float rec_rms = 1.0 / (rms_tmp ? rms_tmp : 1.0);
 
 		for (int i = 0; i < BINS; i++)
 			inp[i] = tmp[i] * win[i];
@@ -174,13 +189,28 @@ int main(int argc, char **argv)
 
 		fftwf_execute(plan);
 
+		float max_tmp = 0.0;
+		for (int i = 0; i < max_hist_size; i++)
+			max_tmp = max_tmp > max_hist[i] ? max_tmp : max_hist[i];
+		float rec_max = 1.0 / (max_tmp ? max_tmp : 1.0);
+
+		float max_power = 0.0;
 		for (int i = 0; i < (BINS / 2); i++) {
 			float amp = cabsf(out[i]) / (float)BINS;
-			float power = powf(amp, 2.0);
+			float power = amp * amp;
+			max_power = max_power < power ? power : max_power;
+			if (norm_vis)
+				power *= rec_max;
 			float decibel = 10.0 * log10f(power);
-			float val = 1.0 + fminf(fmaxf(decibel, -100.0), 0.0) / 100.0;
+			float val = 0;
+			if (log_vis)
+				val = 1.0 + fminf(fmaxf(decibel, -100.0), 0.0) / 100.0;
+			else
+				val = power;
 			fbp[w * i + w - 1] = val_rgb(val);
 		}
+		max_hist[max_hist_last] = max_power;
+		max_hist_last = (max_hist_last + 1) % max_hist_size;
 	}
 	return 0;
 }
