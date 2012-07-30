@@ -115,6 +115,13 @@ int main(int argc, char **argv)
 //		win[i] = hamming(i, BINS, 0.0);
 //		win[i] = kaiser(i, BINS, 3.0);
 
+	float rms_hist_seconds = 0.5;
+	int rms_hist_size = rms_hist_seconds * rate;
+	float *rms_hist = (float *)malloc(sizeof(float) * rms_hist_size);
+	int rms_hist_last = 0;
+	for (int i = 0; i < rms_hist_size; i++)
+		rms_hist[i] = 1.0;
+
 	uint64_t cnt = 0;
 	for (;;) {
 		if (cnt++ > rate / (STEP * 50)) {
@@ -141,8 +148,17 @@ int main(int argc, char **argv)
 		for (int i = 0; i < STEP; i++)
 			tmp[i] = (float)buff[((STEP-1)-i) * channels] / 32768.0;
 
+		for (int i = 0; i < STEP; i++, rms_hist_last = (rms_hist_last + 1) % rms_hist_size)
+			rms_hist[rms_hist_last] = tmp[i] * tmp[i];
+
+		float rms_sum = 0.0;
+		for (int i = 0; i < rms_hist_size; i++)
+			rms_sum += rms_hist[i];
+
+		float rec_rms = 1.0 / sqrtf(rms_sum / (float)rms_hist_size);
+
 		for (int i = 0; i < BINS; i++)
-			inp[i] = tmp[i] * win[i];
+			inp[i] = tmp[i] * rec_rms * win[i];
 
 		fftwf_execute(plan);
 
