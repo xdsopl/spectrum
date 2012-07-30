@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 		if (cnt++ > rate / (STEP * 50)) {
 			cnt = 0;
 			SDL_Flip(screen);
-			SDL_Delay(10);
+			SDL_Delay(15);
 		}
 
 		handle_events();
