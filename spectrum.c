@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 //		win[i] = kaiser(i, BINS, 3.0);
 
 	float rms_hist_seconds = 0.5;
-	int rms_hist_size = rms_hist_seconds * rate;
+	int rms_hist_size = (rms_hist_seconds * rate) / STEP;
 	float *rms_hist = (float *)malloc(sizeof(float) * rms_hist_size);
 	int rms_hist_last = 0;
 	for (int i = 0; i < rms_hist_size; i++)
@@ -152,14 +152,16 @@ int main(int argc, char **argv)
 		for (int i = 0; i < STEP; i++)
 			tmp[i] = (float)buff[((STEP-1)-i) * channels] / 32768.0;
 
-		for (int i = 0; i < STEP; i++, rms_hist_last = (rms_hist_last + 1) % rms_hist_size)
-			rms_hist[rms_hist_last] = tmp[i] * tmp[i];
+		rms_hist[rms_hist_last] = 0;
+		for (int i = 0; i < STEP; i++)
+			rms_hist[rms_hist_last] += tmp[i] * tmp[i];
+		rms_hist_last = (rms_hist_last + 1) % rms_hist_size;
 
 		float rms_sum = 0.0;
 		for (int i = 0; i < rms_hist_size; i++)
 			rms_sum += rms_hist[i];
 
-		float rms = sqrtf(rms_sum / (float)rms_hist_size);
+		float rms = sqrtf(rms_sum / (float)(rms_hist_size * STEP));
 		float rec_rms = 1.0 / fmax(0.01, rms);
 
 		for (int i = 0; i < BINS; i++)
