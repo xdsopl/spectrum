@@ -17,6 +17,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 #define BINS (512)
 #define STEP (8)
 static int pause;
+static int rms_comp = 1;
 
 void handle_events()
 {
@@ -27,6 +28,9 @@ void handle_events()
 				switch (event.key.keysym.sym) {
 					case SDLK_q:
 						exit(0);
+						break;
+					case SDLK_c:
+						rms_comp ^= 1;
 						break;
 					case SDLK_SPACE:
 						pause ^= 1;
@@ -159,7 +163,12 @@ int main(int argc, char **argv)
 		float rec_rms = 1.0 / fmax(0.01, rms);
 
 		for (int i = 0; i < BINS; i++)
-			inp[i] = tmp[i] * rec_rms * win[i];
+			inp[i] = tmp[i] * win[i];
+
+		if (rms_comp) {
+			for (int i = 0; i < BINS; i++)
+				inp[i] *= rec_rms;
+		}
 
 		fftwf_execute(plan);
 
