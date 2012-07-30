@@ -155,7 +155,8 @@ int main(int argc, char **argv)
 		for (int i = 0; i < rms_hist_size; i++)
 			rms_sum += rms_hist[i];
 
-		float rec_rms = 1.0 / sqrtf(rms_sum / (float)rms_hist_size);
+		float rms = sqrtf(rms_sum / (float)rms_hist_size);
+		float rec_rms = 1.0 / fmax(0.01, rms);
 
 		for (int i = 0; i < BINS; i++)
 			inp[i] = tmp[i] * rec_rms * win[i];
