@@ -17,6 +17,7 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 #define BINS (512)
 #define STEP (8)
 static int pause;
+static int rainbow = 1;
 static int rms_comp = 1;
 static int norm_vis = 1;
 static int log_vis = 1;
@@ -40,6 +41,9 @@ void handle_events()
 					case SDLK_n:
 						norm_vis ^= 1;
 						break;
+					case SDLK_r:
+						rainbow ^= 1;
+						break;
 					case SDLK_SPACE:
 						pause ^= 1;
 						break;
@@ -62,14 +66,16 @@ void handle_events()
 
 uint32_t val_rgb(float v)
 {
-#if 1
-	int R = 255.0 * fminf(fmaxf(4.0 * v - 2.0, 0.0), 1.0);
-	int G = 255.0 * fminf(fmaxf(2.0 - 4.0 * fabsf(v - 0.5), 0.0), 1.0);
-	int B = 255.0 * fminf(fmaxf(2.0 - 4.0 * v, 0.0), 1.0);
-	return (R << 16) | (G << 8) | B;
-#else
-	return (int)(255.0 * fminf(fmaxf(v, 0.0), 1.0)) * 0x00010101;
-#endif
+	uint32_t rgb = 0;
+	if (rainbow) {
+		int R = 255.0 * fminf(fmaxf(4.0 * v - 2.0, 0.0), 1.0);
+		int G = 255.0 * fminf(fmaxf(2.0 - 4.0 * fabsf(v - 0.5), 0.0), 1.0);
+		int B = 255.0 * fminf(fmaxf(2.0 - 4.0 * v, 0.0), 1.0);
+		rgb = (R << 16) | (G << 8) | B;
+	} else {
+		rgb = (int)(255.0 * fminf(fmaxf(v, 0.0), 1.0)) * 0x00010101;
+	}
+	return rgb;
 }
 
 int main(int argc, char **argv)
