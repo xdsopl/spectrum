@@ -1,5 +1,5 @@
 
-CFLAGS = -g -D_GNU_SOURCE=1 -W -Wall -O3 -std=c99 -ffast-math $(shell sdl-config --cflags) $(shell pkg-config fftw3f --cflags)
+CFLAGS = -g -D_GNU_SOURCE=1 -W -Wall -O3 -std=c99 -ffast-math -fsingle-precision-constant $(shell sdl-config --cflags) $(shell pkg-config fftw3f --cflags)
 LDFLAGS = -lm -lasound $(shell sdl-config --libs) $(shell pkg-config fftw3f --libs)
 
 all: spectrum
