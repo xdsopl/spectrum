@@ -126,12 +126,12 @@ int main(int argc, char **argv)
 	fftwf_plan plan = fftwf_plan_dft_r2c_1d(BINS, inp, out, FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
 
 	for (int i = 0; i < BINS; i++)
-//		win[i] = rect(i, BINS, 2.0);
-		win[i] = gauss(i, BINS, 0.1);
-//		win[i] = lanczos(i, BINS, 0.0);
-//		win[i] = hann(i, BINS, 0.0);
-//		win[i] = hamming(i, BINS, 0.0);
-//		win[i] = kaiser(i, BINS, 3.0);
+//		win[i] = rect(i, BINS+1, 2.0);
+		win[i] = gauss(i, BINS+1, 0.1);
+//		win[i] = lanczos(i, BINS+1, 0.0);
+//		win[i] = hann(i, BINS+1, 0.0);
+//		win[i] = hamming(i, BINS+1, 0.0);
+//		win[i] = kaiser(i, BINS+1, 3.0);
 
 	float rms_hist_seconds = 0.5;
 	int rms_hist_size = (rms_hist_seconds * rate) / STEP;
