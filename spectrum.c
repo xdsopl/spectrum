@@ -64,16 +64,35 @@ void handle_events()
 
 }
 
+uint32_t srgb(float r, float g, float b)
+{
+	r = fminf(fmaxf(r, 0.0f), 1.0f);
+	g = fminf(fmaxf(g, 0.0f), 1.0f);
+	b = fminf(fmaxf(b, 0.0f), 1.0f);
+#if 1
+	float K0 = 0.03928f;
+	float a = 0.055f;
+	float phi = 12.92f;
+	float gamma = 2.4f;
+	r = r <= K0 / phi ? r * phi : (1.0f + a) * powf(r, 1.0f / gamma) - a;
+	g = g <= K0 / phi ? g * phi : (1.0f + a) * powf(g, 1.0f / gamma) - a;
+	b = b <= K0 / phi ? b * phi : (1.0f + a) * powf(b, 1.0f / gamma) - a;
+#endif
+	return (int)(255.0f * r) << 16 |
+		(int)(255.0f * g) << 8 |
+		(int)(255.0f * b);
+}
+
 uint32_t val_rgb(float v)
 {
 	uint32_t rgb = 0;
 	if (rainbow) {
-		int R = 255.0 * fminf(fmaxf(4.0 * v - 2.0, 0.0), 1.0);
-		int G = 255.0 * fminf(fmaxf(2.0 - 4.0 * fabsf(v - 0.5), 0.0), 1.0);
-		int B = 255.0 * fminf(fmaxf(2.0 - 4.0 * v, 0.0), 1.0);
-		rgb = (R << 16) | (G << 8) | B;
+		float r = 4.0f * v - 2.0f;
+		float g = 2.0f - 4.0f * fabsf(v - 0.5f);
+		float b = 2.0f - 4.0f * v;
+		rgb = srgb(r, g, b);
 	} else {
-		rgb = (int)(255.0 * fminf(fmaxf(v, 0.0), 1.0)) * 0x00010101;
+		rgb = srgb(v, v, v);
 	}
 	return rgb;
 }
