@@ -116,7 +116,6 @@ int main(int argc, char **argv)
 
 	short *buff = (short *)malloc(sizeof(short) * channels * STEP);
 
-	atexit(SDL_Quit);
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Surface *screen = SDL_SetVideoMode(1024, BINS / 2, 32, SDL_HWSURFACE|SDL_DOUBLEBUF);
 	if (NULL == screen)
