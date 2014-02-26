@@ -7,5 +7,5 @@ all: spectrum
 clean:
 	rm -f spectrum *.o
 
-spectrum: spectrum.o mmap_file.o pcm.o wav.o alsa.o window.o
+spectrum: spectrum.o mmap_file.o pcm.o wav.o alsa.o window.o stft.o cqt.o trans.o
 

@@ -6,23 +6,18 @@ You should have received a copy of the CC0 Public Domain Dedication along with t
 spectrum ist written from scratch and is held deliberately simple.
 this means you have to look into the source and change the code to your needs.
 
+you will find 2 implementations for spectral analysis:
+- the STFT (short time fourier transform) for equispaced frequency bins.
+- the CQT (constant q transform) for logarithmically spaced frequency bins.
+please read "An efficient algorithm for the calculation of a constant Q transform" by Judith C. Brown and Miller S. Puckette.
+
 with time i will add some more luxuries but for the moment:
 - you can press SPACE to pause.
-- you can press c to toggle rms compression.
-- you can press n to toggle view normalization
-- you can press l to toggle linear / logarithmic view
+- you can press l to toggle linear / logarithmic power view
+- you can press o to toggle linear / logarithmic frequency view
 - you can press r to toggle rainbow colors / black white gradient
 - you can open alsa devices and 16bit wav files.
 - you can trade time resolution with frequency resolution by changing the parameter to the gauss window.
-
-here an example that shows the header of an Robot36 encoded image,
-with normalized logarithmic view:
-
-http://aam.mathematik.uni-freiburg.de/IAM/homepages/ainan/spectrum_log.png
-
-and with normalized linear view:
-
-http://aam.mathematik.uni-freiburg.de/IAM/homepages/ainan/spectrum_lin.png
 
 compile everything:
 # make
