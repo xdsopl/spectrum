@@ -35,7 +35,7 @@ void get_stft(struct trans *trans, float *out)
 {
 	struct stft *stft = (struct stft *)trans->data;
 	for (int i = 0; i < stft->bins; i++)
-		out[i] = cabsf(stft->out[i]) / (float)(stft->samples);
+		out[i] = cabsf(stft->out[i]);
 }
 
 void free_stft(struct trans *trans)
@@ -66,7 +66,7 @@ struct trans *create_stft(int bins)
 	stft->plan = fftwf_plan_dft_r2c_1d(samples, stft->tmp, stft->out, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	stft->win = (float *)malloc(sizeof(float) * samples);
 	for (int i = 0; i < samples; i++)
-		stft->win[i] = gauss(i, samples|1, 0.2f);
+		stft->win[i] = gauss(i, samples|1, 0.2f) / samples;
 	return (struct trans *)&(stft->base);
 }
 
