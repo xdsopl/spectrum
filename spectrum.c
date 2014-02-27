@@ -19,6 +19,7 @@ static int pause;
 static int rainbow = 1;
 static int log_power = 1;
 static int log_freq = 1;
+static int norm_vis = 0;
 
 void handle_events()
 {
@@ -35,6 +36,9 @@ void handle_events()
 						break;
 					case SDLK_o:
 						log_freq ^= 1;
+						break;
+					case SDLK_n:
+						norm_vis ^= 1;
 						break;
 					case SDLK_r:
 						rainbow ^= 1;
@@ -139,6 +143,13 @@ int main(int argc, char **argv)
 	SDL_WM_SetCaption("Spectrum", "spectrum");
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
+	float max_hist_seconds = 0.5;
+	int max_hist_size = (max_hist_seconds * rate) / STEP;
+	float *max_hist = (float *)malloc(sizeof(float) * max_hist_size);
+	int max_hist_last = 0;
+	for (int i = 0; i < max_hist_size; i++)
+		max_hist[i] = 0.0;
+
 	uint64_t cnt = 0;
 	for (;;) {
 		if (cnt++ > rate / (STEP * 50)) {
@@ -174,14 +185,25 @@ int main(int argc, char **argv)
 #endif
 		get_trans(trans, out);
 
+		float max_tmp = 0.0;
+		for (int i = 0; i < max_hist_size; i++)
+			max_tmp = max_tmp > max_hist[i] ? max_tmp : max_hist[i];
+		float rec_max = 1.0 / (max_tmp ? max_tmp : 1.0);
+
+		float max_power = 0.0;
 		for (int i = 0; i < BINS; i++) {
 			float power = out[i] * out[i];
+			max_power = max_power < power ? power : max_power;
+			if (norm_vis)
+				power *= rec_max;
 			float decibel = 10.0f * log10f(power);
 			float val = power;
 			if (log_power)
 				val = 1.0f + fminf(fmaxf(decibel, -100.0f), 0.0f) / 100.0f;
 			fbp[w * i + w - 1] = val_rgb(val);
 		}
+		max_hist[max_hist_last] = max_power;
+		max_hist_last = (max_hist_last + 1) % max_hist_size;
 	}
 	return 0;
 }
