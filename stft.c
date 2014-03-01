@@ -65,8 +65,13 @@ struct trans *create_stft(int bins)
 	stft->out = (complex float *)malloc(sizeof(complex float) * bins);
 	stft->plan = fftwf_plan_dft_r2c_1d(samples, stft->tmp, stft->out, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	stft->win = (float *)malloc(sizeof(float) * samples);
+	float sum = 0.0f;
+	for (int i = 0; i < samples; i++) {
+		stft->win[i] = gauss(i, samples|1, 0.2f);
+		sum += stft->win[i];
+	}
 	for (int i = 0; i < samples; i++)
-		stft->win[i] = gauss(i, samples|1, 0.2f) / samples;
+		stft->win[i] /= sum;
 	return (struct trans *)&(stft->base);
 }
 
