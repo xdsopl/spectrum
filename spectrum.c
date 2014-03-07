@@ -196,10 +196,10 @@ int main(int argc, char **argv)
 			max_power = max_power < power ? power : max_power;
 			if (norm_vis)
 				power *= rec_max;
-			float decibel = 10.0f * log10f(power);
+			float decibel = 10.0f * log10f(fmaxf(0.000001f, power));
 			float val = power;
 			if (log_power)
-				val = 1.0f + fminf(fmaxf(decibel, -100.0f), 0.0f) / 100.0f;
+				val = 1.0f + fminf(fmaxf(decibel, -60.0f), 0.0f) / 60.0f;
 			fbp[w * i + w - 1] = val_rgb(val);
 		}
 		max_hist[max_hist_last] = max_power;
