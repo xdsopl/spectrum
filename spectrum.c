@@ -86,9 +86,9 @@ uint32_t val_rgb(float v)
 {
 	uint32_t rgb = 0;
 	if (rainbow) {
-		float r = 4.0f * v - 2.0f;
-		float g = 2.0f - 4.0f * fabsf(v - 0.5f);
-		float b = 2.0f - 4.0f * v;
+		float r = v * fminf(fmaxf(4.0f * v - 2.0f, 0.0f), 1.0f);
+		float g = v * fminf(fmaxf(1.0f - 4.0f * fabsf(v - 0.5f), 0.0f), 1.0f);
+		float b = v * fminf(fmaxf(2.0f - 4.0f * v, 0.0f), 1.0f);
 		rgb = srgb(r, g, b);
 	} else {
 		rgb = srgb(v, v, v);
