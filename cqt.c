@@ -142,7 +142,7 @@ struct trans *create_cqt(int bins, float rate, float f_min, float f_max)
 
 	cqt->in = (float *)malloc(sizeof(float) * samples);
 	memset(cqt->in, 0, sizeof(float) * samples);
-	cqt->out = (complex float *)malloc(sizeof(complex float) * samples / 2);
+	cqt->out = (complex float *)malloc(sizeof(complex float) * (samples / 2 + 1));
 	cqt->plan = fftwf_plan_dft_r2c_1d(samples, cqt->in, cqt->out, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	return (struct trans *)&(cqt->base);
 }
