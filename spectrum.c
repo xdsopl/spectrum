@@ -69,7 +69,7 @@ uint32_t srgb(float r, float g, float b)
 	g = fminf(fmaxf(g, 0.0f), 1.0f);
 	b = fminf(fmaxf(b, 0.0f), 1.0f);
 #if 1
-	float K0 = 0.03928f;
+	float K0 = 0.04045f;
 	float a = 0.055f;
 	float phi = 12.92f;
 	float gamma = 2.4f;
